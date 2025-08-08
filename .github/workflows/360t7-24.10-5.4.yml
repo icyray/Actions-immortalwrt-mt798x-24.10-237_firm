@@ -130,7 +130,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=360T7 24.10-5.4 $(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
+        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-360T7-24.10-5.4" >> $GITHUB_OUTPUT
         touch "${RELEASE_FILE}"
         [ ${UPLOAD_GOFILE} = true && ${{ steps.gofile.outputs.url }} ] && echo "🔗 [GoFile](${{ steps.gofile.outputs.url }})" >> "${RELEASE_FILE}"
         echo "status=success" >> $GITHUB_OUTPUT
