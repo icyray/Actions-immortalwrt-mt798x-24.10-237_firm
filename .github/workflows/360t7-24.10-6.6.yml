@@ -72,7 +72,7 @@ jobs:
       diy_p1_sh: ${{ needs.setup.outputs.diy_p1_sh }}
       diy_p2_sh: ${{ needs.setup.outputs.diy_p2_sh }}
       release_file: ${{ needs.setup.outputs.release_file }}
-      upload_bin_dir: ${{ needs.setup.outputs.upload_bin_dir }}
-      upload_firmware: ${{ needs.setup.outputs.upload_firmware }}
-      upload_release: ${{ needs.setup.outputs.upload_release }}
+      upload_bin_dir: ${{ needs.setup.outputs.upload_bin_dir == 'true' }}
+      upload_firmware: ${{ needs.setup.outputs.upload_firmware == 'true' }}
+      upload_release: ${{ needs.setup.outputs.upload_release == 'true' }}
       tz: ${{ needs.setup.outputs.tz }}
