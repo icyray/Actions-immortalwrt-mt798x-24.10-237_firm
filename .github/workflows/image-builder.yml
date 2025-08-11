@@ -10,7 +10,7 @@
 # See /LICENSE for more information.
 #
 
-name: Build 360T7 Immortalwrt 24.10-6.6
+name: Immortalwrt Firmware Image Builder
 
 on:
   workflow_call:
