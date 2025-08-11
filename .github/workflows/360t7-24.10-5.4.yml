@@ -30,20 +30,49 @@ env:
   TZ: Asia/Shanghai
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
+    outputs:
+      repo_url: ${{ steps.get-env.outputs.repo_url }}
+      repo_branch: ${{ steps.get-env.outputs.repo_branch }}
+      feeds_conf: ${{ steps.get-env.outputs.feeds_conf }}
+      config_file: ${{ steps.get-env.outputs.config_file }}
+      diy_p1_sh: ${{ steps.get-env.outputs.diy_p1_sh }}
+      diy_p2_sh: ${{ steps.get-env.outputs.diy_p2_sh }}
+      release_file: ${{ steps.get-env.outputs.release_file }}
+      upload_bin_dir: ${{ steps.get-env.outputs.upload_bin_dir }}
+      upload_firmware: ${{ steps.get-env.outputs.upload_firmware }}
+      upload_release: ${{ steps.get-env.outputs.upload_release }}
+      tz: ${{ steps.get-env.outputs.tz }}
+
     steps:
-    - name: Call image-builder
-      uses: ./.github/workflows/image-builder.yml
-      with:
-        repo_url: ${{ env.REPO_URL }}
-        repo_branch: ${{ env.REPO_BRANCH }}
-        feeds_conf: ${{ env.FEEDS_CONF }}
-        config_file: ${{ env.CONFIG_FILE }}
-        diy_p1_sh: ${{ env.DIY_P1_SH }}
-        diy_p2_sh: ${{ env.DIY_P2_SH }}
-        release_file: ${{ env.RELEASE_FILE }}
-        upload_bin_dir: ${{ env.UPLOAD_BIN_DIR }}
-        upload_firmware: ${{ env.UPLOAD_FIRMWARE }}
-        upload_release: ${{ env.UPLOAD_RELEASE }}
-        tz: ${{ env.TZ }}
+      - name: Get environment from env
+        id: get-env
+        run: |
+          echo "repo_url=${{ env.REPO_URL }}" >> $GITHUB_OUTPUT
+          echo "repo_branch=${{ env.REPO_BRANCH }}" >> $GITHUB_OUTPUT
+          echo "feeds_conf=${{ env.FEEDS_CONF }}" >> $GITHUB_OUTPUT
+          echo "config_file=${{ env.CONFIG_FILE }}" >> $GITHUB_OUTPUT
+          echo "diy_p1_sh=${{ env.DIY_P1_SH }}" >> $GITHUB_OUTPUT
+          echo "diy_p2_sh=${{ env.DIY_P2_SH }}" >> $GITHUB_OUTPUT
+          echo "release_file=${{ env.RELEASE_FILE }}" >> $GITHUB_OUTPUT
+          echo "upload_bin_dir=${{ env.UPLOAD_BIN_DIR }}" >> $GITHUB_OUTPUT
+          echo "upload_firmware=${{ env.UPLOAD_FIRMWARE }}" >> $GITHUB_OUTPUT
+          echo "upload_release=${{ env.UPLOAD_RELEASE }}" >> $GITHUB_OUTPUT
+          echo "tz=${{ env.TZ }}" >> $GITHUB_OUTPUT
+
+  call-builder:
+    needs: setup
+    uses: ./.github/workflows/image-builder.yml
+    with:
+      repo_url: ${{ needs.setup.outputs.repo_url }}
+      repo_branch: ${{ needs.setup.outputs.repo_branch }}
+      feeds_conf: ${{ needs.setup.outputs.feeds_conf }}
+      config_file: ${{ needs.setup.outputs.config_file }}
+      diy_p1_sh: ${{ needs.setup.outputs.diy_p1_sh }}
+      diy_p2_sh: ${{ needs.setup.outputs.diy_p2_sh }}
+      release_file: ${{ needs.setup.outputs.release_file }}
+      upload_bin_dir: ${{ needs.setup.outputs.upload_bin_dir }}
+      upload_firmware: ${{ needs.setup.outputs.upload_firmware }}
+      upload_release: ${{ needs.setup.outputs.upload_release }}
+      tz: ${{ needs.setup.outputs.tz }}
