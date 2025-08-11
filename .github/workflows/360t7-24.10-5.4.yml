@@ -31,18 +31,19 @@ env:
 
 jobs:
   build:
-    uses: ./.github/workflows/image-builder.yml
-    with:
-      repo_url: ${{ env.REPO_URL }}
-      repo_branch: ${{ env.REPO_BRANCH }}
-      feeds_conf: ${{ env.FEEDS_CONF }}
-      config_file: ${{ env.CONFIG_FILE }}
-      diy_p1_sh: ${{ env.DIY_P1_SH }}
-      diy_p2_sh: ${{ env.DIY_P2_SH }}
-      release_file: ${{ env.RELEASE_FILE }}
-      upload_bin_dir: ${{ env.UPLOAD_BIN_DIR }}
-      upload_firmware: ${{ env.UPLOAD_FIRMWARE }}
-      upload_release: ${{ env.UPLOAD_RELEASE }}
-      tz: ${{ env.TZ }}
-
-
+    runs-on: ubuntu-latest
+    steps:
+    - name: Call image-builder
+      uses: ./.github/workflows/image-builder.yml
+      with:
+        repo_url: ${{ env.REPO_URL }}
+        repo_branch: ${{ env.REPO_BRANCH }}
+        feeds_conf: ${{ env.FEEDS_CONF }}
+        config_file: ${{ env.CONFIG_FILE }}
+        diy_p1_sh: ${{ env.DIY_P1_SH }}
+        diy_p2_sh: ${{ env.DIY_P2_SH }}
+        release_file: ${{ env.RELEASE_FILE }}
+        upload_bin_dir: ${{ env.UPLOAD_BIN_DIR }}
+        upload_firmware: ${{ env.UPLOAD_FIRMWARE }}
+        upload_release: ${{ env.UPLOAD_RELEASE }}
+        tz: ${{ env.TZ }}
