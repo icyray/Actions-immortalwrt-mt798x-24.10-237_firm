@@ -174,8 +174,9 @@ jobs:
       run: |
         echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
         touch "${RELEASE_FILE}"
+        echo >> ${RELEASE_FILE}
         echo "Source <${REPO_URL}/tree/${REPO_BRANCH}>" >> ${RELEASE_FILE}
-        echo "Compiled by commit ${REPO_URL}/commit/$(git rev-parse HEAD)" >> ${RELEASE_FILE}
+        echo "Compiled by commit ${REPO_URL}/commit/$(git -C openwrt rev-parse HEAD)" >> ${RELEASE_FILE}
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
