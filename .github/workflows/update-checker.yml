@@ -22,10 +22,10 @@ on:
 #    - cron: 0 */18 * * *
 
 jobs:
-  get-env:
+  get-repo:
     runs-on: ubuntu-latest
     outputs: 
-      result: ${{ steps.get-data.outputs.result }}
+      result: ${{ steps.get-env.outputs.result }}
 
     steps:
       - name: Checkout
@@ -42,7 +42,7 @@ jobs:
           npm install js-yaml
 
       - name: Get environment from workflows
-        id: get-data
+        id: get-env
         uses: actions/github-script@v7
         with:
           script: |
@@ -81,11 +81,14 @@ jobs:
             console.log(result);
             return result;
 
-  test:
-    needs: [get-env]
+  check:
+    needs: [get-repo]
+    strategy:
+      matrix:
+        repo: ${{ fromJson(needs.get-repo.outputs.result) }}
     runs-on: ubuntu-latest
     steps:
-      - run: echo "${{ needs.get-env.outputs.result }}"
+      - run: echo "${{ matrix.repo.repo }}"
 
     # - name: Get Commit Hash
     #   id: getHash
