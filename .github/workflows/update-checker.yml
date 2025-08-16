@@ -22,38 +22,96 @@ on:
 #    - cron: 0 */18 * * *
 
 jobs:
-  check:
+  get-env:
     runs-on: ubuntu-latest
+    outputs: 
+      result: ${{ steps.get-data.outputs.result }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v5
 
-    - name: Get Commit Hash
-      id: getHash
-      run: |
-        git clone --depth 1 $REPO_URL -b $REPO_BRANCH .
-        echo "commitHash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-    - name: Compare Commit Hash
-      id: cacheHash
-      uses: actions/cache@v3
-      with:
-        path: .commitHash
-        key: commitHash_${{ steps.getHash.outputs.commitHash }}
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install js-yaml
 
-    - name: Save New Commit Hash
-      if: steps.cacheHash.outputs.cache-hit != 'true'
-      run: |
-        echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
+      - name: Get environment from workflows
+        id: get-data
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const yaml = require('js-yaml');
+            const result = {};
 
-    - name: Trigger build
-      if: steps.cacheHash.outputs.cache-hit != 'true'
-      uses: peter-evans/repository-dispatch@v2
-      with:
-        token: ${{ github.token }}
-        event-type: Source Code Update
+            const globber = await glob.create('./.github/workflows/*.yml');
+            for await (const file of globber.globGenerator()) {
+                console.log(file);
+                const fileContents = fs.readFileSync(file, 'utf8');
+                const workflow = yaml.load(fileContents);
+                const filename = path.basename(filePath, '.yml');
 
-    - name: Delete workflow runs
-      uses: Mattraks/delete-workflow-runs@v2
-      with:
-        retain_days: 0
-        keep_minimum_runs: 2
+                if (!(workflow && workflow.env && workflow.env.UPDATER_ENABLED)) {
+                    console.log('Skipping disabled workflow: ' + file);
+                    continue;
+                }
+
+                const sourceRepo = workflow.env.REPO_URL;
+                const repoBranch = workflow.env.REPO_BRANCH;
+                const repoDefcfg = workflow.env.UPDATER_DEFCONFIG;
+
+                if (!(sourceRepo && repoBranch && repoDefcfg)) {
+                    console.log('Invalid workflow: ' + file);
+                    continue;
+                }
+
+                result[filename] = {
+                    repo: sourceRepo,
+                    branch: repoBranch,
+                    defcfg: repoDefcfg
+                };
+                return result;
+            }
+
+  test:
+    needs: [get-env]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ needs.get-env.outputs.result }}"
+
+    # - name: Get Commit Hash
+    #   id: getHash
+    #   run: |
+    #     git clone --depth 1 $REPO_URL -b $REPO_BRANCH .
+    #     echo "commitHash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+    # - name: Compare Commit Hash
+    #   id: cacheHash
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: .commitHash
+    #     key: commitHash_${{ steps.getHash.outputs.commitHash }}
+
+    # - name: Save New Commit Hash
+    #   if: steps.cacheHash.outputs.cache-hit != 'true'
+    #   run: |
+    #     echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
+
+    # - name: Trigger build
+    #   if: steps.cacheHash.outputs.cache-hit != 'true'
+    #   uses: benc-uk/workflow-dispatch@v1
+    #   with:
+    #     workflow: 1.yml
+
+    # - name: Delete workflow runs
+    #   uses: Mattraks/delete-workflow-runs@v2
+    #   with:
+    #     retain_days: 0
+    #     keep_minimum_runs: 2
