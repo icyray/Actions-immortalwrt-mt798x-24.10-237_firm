@@ -56,7 +56,7 @@ jobs:
                 console.log(file);
                 const fileContents = fs.readFileSync(file, 'utf8');
                 const workflow = yaml.load(fileContents);
-                const filename = path.basename(filePath, '.yml');
+                const filename = path.basename(file, '.yml');
 
                 if (!(workflow && workflow.env && workflow.env.UPDATER_ENABLED)) {
                     console.log('Skipping disabled workflow: ' + file);
