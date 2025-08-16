@@ -59,7 +59,8 @@ jobs:
                 }
 
                 const workflowName = workflow.name || filename;
-                const sourceRepo = workflow.env.REPO_URL;
+                const match = workflow.env.REPO_URL.match(/github\.com[\/:]([^\/]+)\/([^\/\s]+?)(?:\.git)?(?:\/.*)?$/);
+                const sourceRepo = match ? `${match[1]}/${match[2]}` : null;
                 const repoBranch = workflow.env.REPO_BRANCH;
                 const repoDefcfg = workflow.env.UPDATER_DEFCONFIG;
 
@@ -90,8 +91,8 @@ jobs:
       - name: Get commit hash
         id: get-hash
         run: |
-          repo_data=$(curl -s https://api.github.com/repos/${{ matrix.repo.repo }}/commits/${{ matrix.repo.branch }})
-          def_data=$(curl -s https://api.github.com/repos/${{ matrix.repo.repo }}/commits?path=${{ matrix.repo.defcfg }}&sha=${{ matrix.repo.branch }})
+          repo_data=$(curl -s 'https://api.github.com/repos/${{ matrix.repo.repo }}/commits/${{ matrix.repo.branch }}')
+          def_data=$(curl -s 'https://api.github.com/repos/${{ matrix.repo.repo }}/commits?path=${{ matrix.repo.defcfg }}&sha=${{ matrix.repo.branch }}')
 
           repo_hash=$(echo "$repo_data" | jq -r '.sha')
           repo_message=$(echo "$repo_data" | jq -r '.commit.message')
