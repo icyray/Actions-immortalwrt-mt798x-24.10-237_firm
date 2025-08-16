@@ -1,0 +1,36 @@
+name: Clean up
+
+concurrency:
+  group: clean-up
+  cancel-in-progress: false
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      clean-release:
+        type: boolean
+        required: false
+        default: false
+
+env:
+  CLEAN_RELEASE: ${{ inputs.clean-release }}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Delete workflow runs
+      uses: Mattraks/delete-workflow-runs@v2
+      with:
+        retain_days: 0
+        keep_minimum_runs: 2
+
+    - name: Remove old Releases
+      if: ${{ env.CLEAN_RELEASE }} == true
+      uses: Nats-ji/delete-old-releases@v1
+      with:
+        keep-count: 4
+        keep-old-minor-releases: true
+        remove-tags: true
+        token: ${{ secrets.GITHUB_TOKEN }}

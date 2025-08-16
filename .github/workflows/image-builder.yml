@@ -198,17 +198,9 @@ jobs:
           body_path: ${{ env.RELEASE_FILE }}
           files: ${{ env.FIRMWARE }}/*
 
-      - name: Delete workflow runs
-        uses: Mattraks/delete-workflow-runs@main
-        with:
-          retain_days: 0
-          keep_minimum_runs: 2
-
-      - name: Remove old Releases
-        uses: dev-drprasad/delete-older-releases@master
-        if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-        with:
-          keep_latest: 3
-          delete_tags: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  cleanup:
+    if: success()
+    uses: ./.github/workflows/clean-up.yml
+    needs: build
+    with:
+      clean-release: true
