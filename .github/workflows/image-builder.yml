@@ -10,7 +10,7 @@
 # See /LICENSE for more information.
 #
 
-name: Immortalwrt Firmware Image Builder
+name: Image Builder
 
 on:
   workflow_call:
