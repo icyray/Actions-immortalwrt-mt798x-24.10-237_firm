@@ -95,9 +95,9 @@ jobs:
           def_data=$(curl -s -L 'https://api.github.com/repos/${{ matrix.repo.repo }}/commits?path=${{ matrix.repo.defcfg }}&sha=${{ matrix.repo.branch }}')
 
           repo_hash=$(echo "$repo_data" | jq -r '.sha')
-          repo_message=$(echo "$repo_data" | jq -r '.commit.message')
+          repo_message=$(echo "$repo_data" | jq -r '.commit.message | split("\n")[0]')
           def_hash=$(echo "$def_data" | jq -r '.[0].sha')
-          def_message=$(echo "$def_data" | jq -r '.[0].commit.message')
+          def_message=$(echo "$def_data" | jq -r '.[0].commit.message | split("\n")[0]')
 
           echo "${repo_hash}"
           echo "${def_hash}"
