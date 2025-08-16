@@ -28,9 +28,9 @@ jobs:
 
     - name: Remove old Releases
       if: ${{ env.CLEAN_RELEASE }} == true
-      uses: Nats-ji/delete-old-releases@v1
+      uses: ophub/delete-releases-workflows@main
       with:
-        keep-count: 4
-        keep-old-minor-releases: true
-        remove-tags: true
-        token: ${{ secrets.GITHUB_TOKEN }}
+        delete_releases: true
+        releases_keep_latest: 4
+        delete_tags: true
+        gh_token: ${{ secrets.GITHUB_TOKEN }}
