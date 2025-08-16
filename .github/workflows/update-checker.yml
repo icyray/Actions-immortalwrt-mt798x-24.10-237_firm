@@ -91,7 +91,7 @@ jobs:
         repo: ${{ fromJson(needs.get-repo.outputs.repo) }}
     runs-on: ubuntu-latest
     steps:
-      - run: echo "${{ matrix.repo }}"
+      - run: echo "${{ matrix.repo.name }}"
 
     # - name: Get Commit Hash
     #   id: getHash
