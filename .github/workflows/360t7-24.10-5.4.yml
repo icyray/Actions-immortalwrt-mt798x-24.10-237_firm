@@ -29,6 +29,9 @@ env:
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
+  UPDATER_ENABLED: true
+  UPDATER_DEFCONFIG: defconfig/mt7981-ax3000.config
+
 jobs:
   setup:
     runs-on: ubuntu-latest
