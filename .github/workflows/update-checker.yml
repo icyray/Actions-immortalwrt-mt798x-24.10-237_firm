@@ -38,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm init -y
           npm install js-yaml
 
       - name: Get environment from workflows
