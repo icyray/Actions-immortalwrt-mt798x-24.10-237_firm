@@ -91,6 +91,8 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}" | \
             jq -r '.path | split("/") | .[-1]')
 
+          FILENAME=${FILENAME%.yml}
+
           echo "filename=$FILENAME" >> $GITHUB_OUTPUT
           echo "Current workflow file: $FILENAME"
 
