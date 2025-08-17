@@ -63,6 +63,11 @@ jobs:
           echo "upload_firmware=${{ env.UPLOAD_FIRMWARE }}" >> $GITHUB_OUTPUT
           echo "upload_release=${{ env.UPLOAD_RELEASE }}" >> $GITHUB_OUTPUT
           echo "tz=${{ env.TZ }}" >> $GITHUB_OUTPUT
+      - name: test
+        run: |
+          echo ${{ github.event_name}}
+          echo ${{ github.actor }}
+          echo ${{ github.triggering_actor }}
 
   call-builder:
     needs: setup
