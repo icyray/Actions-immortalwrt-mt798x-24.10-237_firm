@@ -38,6 +38,7 @@ git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
 
 # easytier
 git clone https://github.com/EasyTier/luci-app-easytier package/luci-app-easytier
+sed -i 's/util.pcdata/xml.pcdata/g' package/luci-app-easytier/luci-app-easytier/luasrc/model/cbi/easytier.lua
 
 # defconfig
 # cp -f ../.config .config
