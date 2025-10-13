@@ -36,6 +36,9 @@ git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
 sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
 git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
 
+# easytier
+git clone https://github.com/EasyTier/luci-app-easytier package/luci-app-easytier
+
 # defconfig
 # cp -f ../.config .config
 # cp -f defconfig/mt7981-ax3000.config .config
