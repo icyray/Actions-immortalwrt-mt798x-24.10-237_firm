@@ -37,7 +37,7 @@ sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/package
 git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
 
 # easytier
-git clone https://github.com/EasyTier/luci-app-easytier package/luci-app-easytier
+git clone -b openwrt-24.10-6.6 optional-easytier-web --single-branch https://github.com/icyray/luci-app-easytier package/luci-app-easytier
 sed -i 's/util.pcdata/xml.pcdata/g' package/luci-app-easytier/luci-app-easytier/luasrc/model/cbi/easytier.lua
 
 # defconfig
