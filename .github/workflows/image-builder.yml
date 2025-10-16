@@ -146,8 +146,8 @@ jobs:
           echo -e "$(nproc) thread compile"
           make -j$(nproc) || make -j1 || make -j1 V=s
           grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
-          [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV || echo "DEVICE_NAME=unknown" >> $GITHUB_ENV
-          echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+          [ -s DEVICE_NAME ] && echo "DEVICE_NAME=$(cat DEVICE_NAME)" >> $GITHUB_ENV || echo "DEVICE_NAME=unknown" >> $GITHUB_ENV
+          echo "FILE_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
       - name: Check space usage
         if: (!cancelled())
@@ -157,7 +157,7 @@ jobs:
         uses: actions/upload-artifact@main
         if: steps.compile.conclusion == 'success' && env.UPLOAD_BIN_DIR == 'true'
         with:
-          name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+          name: OpenWrt_bin_${{ env.DEVICE_NAME }}_${{ env.FILE_DATE }}
           path: openwrt/bin
 
       - name: Organize files
@@ -172,7 +172,7 @@ jobs:
         uses: actions/upload-artifact@main
         if: steps.organize.conclusion == 'success' && !cancelled()
         with:
-          name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+          name: OpenWrt_firmware_${{ env.DEVICE_NAME }}_${{ env.FILE_DATE }}
           path: ${{ env.FIRMWARE }}
 
       - name: Generate release tag
@@ -181,9 +181,11 @@ jobs:
         run: |
           echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
           touch "${RELEASE_FILE}"
-          echo >> ${RELEASE_FILE}
-          echo "Source: <${REPO_URL}/tree/${REPO_BRANCH}>" >> ${RELEASE_FILE}
-          echo "Compiled by commit: ${REPO_URL}/commit/$(git -C openwrt rev-parse HEAD)" >> ${RELEASE_FILE}
+          BADGE="[![Build Time](https://img.shields.io/badge/build-$(date +"%Y--%m--%d_%H:%M")-brightgreen?logo=github)](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          ![Device](https://img.shields.io/badge/device-${{ env.DEVICE_NAME }}-blue)
+          [![Source Repo](https://img.shields.io/badge/source-repo-orange?logo=github)](${REPO_URL}/tree/${REPO_BRANCH})
+          [![Commit](https://img.shields.io/badge/commit-$(git -C openwrt rev-parse --short=7 HEAD)-yellow?logo=github)](${REPO_URL}/commit/$(git -C openwrt rev-parse HEAD))"
+          grep -q "!\[Badge\]" "${RELEASE_FILE}" && sed -i "/!\[Badge\]/c\\${BADGE}" "${RELEASE_FILE}" || sed -i "1i\\{BADGE}" "${RELEASE_FILE}"
 
       - name: Upload firmware to release
         uses: softprops/action-gh-release@v2
