@@ -1,0 +1,56 @@
+name: release-test
+
+on:
+  workflow_dispatch:
+
+env:
+  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-24.10
+  REPO_BRANCH: openwrt-24.10-6.6
+  FEEDS_CONF: feeds.conf.default
+  CONFIG_FILE: 360t7-24.10-6.6-pw2-mosdns-tailscale.config
+  DIY_P1_SH: diy-part1.sh
+  DIY_P2_SH: 360t7-24.10-6.6-pw2-mosdns-tailscale.sh
+  RELEASE_FILE: 360t7-24.10-6.6-pw2-mosdns-tailscale.md
+  UPLOAD_BIN_DIR: false
+  UPLOAD_FIRMWARE: true
+  UPLOAD_RELEASE: true
+  TZ: Asia/Shanghai
+
+jobs:
+  release-test:
+    runs-on: ubuntu-22.04
+    env:
+      DEVICE_NAME: 360t7
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo timedatectl set-timezone "$TZ"
+          sudo mkdir -p /workdir
+          sudo chown $USER:$GROUPS /workdir
+      - name: Clone source code
+        working-directory: /workdir
+        run: |
+          df -hT $PWD
+          git clone $REPO_URL -b $REPO_BRANCH openwrt
+          ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+      - name: Generate release tag
+        run: |
+          echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
+          touch "${RELEASE_FILE}"
+          BADGE="[![Build Time](https://img.shields.io/badge/build-$(date +"%Y--%m--%d_%H:%M")-brightgreen?logo=github)](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          ![Device](https://img.shields.io/badge/device-${{ env.DEVICE_NAME }}-blue)
+          [![Source Repo](https://img.shields.io/badge/source-repo-orange?logo=github)](${REPO_URL}/tree/${REPO_BRANCH})
+          [![Commit](https://img.shields.io/badge/commit-$(git -C openwrt rev-parse --short=7 HEAD)-yellow?logo=github)](${REPO_URL}/commit/$(git -C openwrt rev-parse HEAD))"
+          grep -q "!\[Badge\]" "${RELEASE_FILE}" && sed -i "/!\[Badge\]/c\\${BADGE}" "${RELEASE_FILE}" || sed -i "1i\\{BADGE}" "${RELEASE_FILE}"
+
+      - name: Upload firmware to release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body_path: ${{ env.RELEASE_FILE }}
+          tag_name: test
