@@ -184,7 +184,7 @@ jobs:
           BADGE=$(mktemp)
           cat > "$BADGE" << EOF
           [![Build Time](https://img.shields.io/badge/build-$(date +"%Y--%m--%d_%H:%M")-brightgreen?logo=github)](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) \
-          ![Device](https://img.shields.io/badge/device-${{ env.DEVICE_NAME }}-blue) \
+          ![Device](https://img.shields.io/badge/device-$(echo ${{ env.DEVICE_NAME }} | sed 's/-/--/g')-blue) \
           [![Source Repo](https://img.shields.io/badge/source-repo-orange?logo=github)](${REPO_URL}/tree/${REPO_BRANCH}) \
           [![Commit](https://img.shields.io/badge/commit-$(git -C openwrt rev-parse --short HEAD)-yellow?logo=github)](${REPO_URL}/commit/$(git -C openwrt rev-parse HEAD))
           EOF
