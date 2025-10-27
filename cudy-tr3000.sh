@@ -24,6 +24,10 @@ rm -rf feeds/luci/applications/luci-app-passwall
 # git clone https://github.com/xiaorouji/openwrt-passwall package/passwall-luci
 git clone https://github.com/xiaorouji/openwrt-passwall2 package/passwall2-luci
 
+# tailscale
+sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
+git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
+
 # defconfig
 # cp -f ../.config .config
 # cp -f defconfig/mt7981-ax3000.config .config
