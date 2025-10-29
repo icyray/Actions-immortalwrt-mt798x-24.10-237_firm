@@ -63,9 +63,9 @@ jobs:
                 const match = workflow.env.REPO_URL.match(/github\.com[\/:]([^\/]+)\/([^\/\s]+?)(?:\.git)?(?:\/.*)?$/);
                 const sourceRepo = match ? `${match[1]}/${match[2]}` : null;
                 const repoBranch = workflow.env.REPO_BRANCH;
-                const repoDefcfg = workflow.env.UPDATER_DEFCONFIG;
+                const repoDefcfg = workflow.env && workflow.env.UPDATER_DEFCONFIG ? workflow.env.UPDATER_DEFCONFIG : null;
 
-                if (!(sourceRepo && repoBranch && repoDefcfg)) {
+                if (!(sourceRepo && repoBranch)) {
                     console.log('Invalid workflow: ' + file);
                     continue;
                 }
@@ -93,15 +93,22 @@ jobs:
         id: get-hash
         run: |
           repo_data=$(curl -s -L 'https://api.github.com/repos/${{ matrix.repo.repo }}/commits/${{ matrix.repo.branch }}')
-          def_data=$(curl -s -L 'https://api.github.com/repos/${{ matrix.repo.repo }}/commits?path=${{ matrix.repo.defcfg }}&sha=${{ matrix.repo.branch }}')
 
           repo_hash=$(echo "$repo_data" | jq -r '.sha')
           repo_message=$(echo "$repo_data" | jq -r '.commit.message | split("\n")[0]')
-          def_hash=$(echo "$def_data" | jq -r '.[0].sha')
-          def_message=$(echo "$def_data" | jq -r '.[0].commit.message | split("\n")[0]')
 
           echo "repo_hash=${repo_hash}" >> $GITHUB_OUTPUT
           echo "repo_message=${repo_message}" >> $GITHUB_OUTPUT
+
+      - name: Get defconfig commit hash
+        id: get-def-hash
+        if: matrix.repo.defcfg
+        run: |
+          def_data=$(curl -s -L 'https://api.github.com/repos/${{ matrix.repo.repo }}/commits?path=${{ matrix.repo.defcfg }}&sha=${{ matrix.repo.branch }}')
+
+          def_hash=$(echo "$def_data" | jq -r '.[0].sha' || echo null)
+          def_message=$(echo "$def_data" | jq -r '.[0].commit.message | split("\n")[0]' || echo null)
+
           echo "def_hash=${def_hash}" >> $GITHUB_OUTPUT
           echo "def_message=${def_message}" >> $GITHUB_OUTPUT
 
@@ -115,10 +122,11 @@ jobs:
 
       - name: Check defconfig hash
         id: cache-def-hash
+        if: matrix.repo.defcfg && steps.get-def-hash.outputs.def_hash != 'null'
         uses: actions/cache@v3
         with:
           path: .def-hash
-          key: def-hash_${{matrix.repo.filename}}_${{ steps.get-hash.outputs.def_hash }}
+          key: def-hash_${{matrix.repo.filename}}_${{ steps.get-def-hash.outputs.def_hash }}
           lookup-only: true
 
       - name: Cache repo hash
@@ -126,11 +134,11 @@ jobs:
         run: echo ${{ steps.get-hash.outputs.repo_hash }} > .repo-hash
 
       - name: Cache defconfig hash
-        if: steps.cache-def-hash.outputs.cache-hit != 'true'
-        run: echo ${{ steps.get-hash.outputs.def_hash }} > .def-hash
+        if: matrix.repo.defcfg && steps.get-def-hash.outputs.def_hash != 'null' && steps.cache-def-hash.outputs.cache-hit != 'true'
+        run: echo ${{ steps.get-def-hash.outputs.def_hash }} > .def-hash
 
       - name: Notification for new defconfig
-        if: steps.cache-def-hash.outputs.cache-hit != 'true'
+        if: matrix.repo.defcfg && steps.get-def-hash.outputs.def_hash != 'null' && steps.cache-def-hash.outputs.cache-hit != 'true'
         uses: dacbd/create-issue-action@main
         with:
           title: "New def-config available for workflow ${{ matrix.repo.name }}"
@@ -139,8 +147,8 @@ jobs:
             - **Repo**: `${{ matrix.repo.repo }}`
             - **Branch**: `${{ matrix.repo.branch }}`
             - **Defconfig**: `${{ matrix.repo.defcfg }}`
-            - **Message**: ${{ steps.get-hash.outputs.def_message }}
-            - **Link**: <https://github.com/${{ matrix.repo.repo }}/commit/${{ steps.get-hash.outputs.def_hash }}>
+            - **Message**: ${{ steps.get-def-hash.outputs.def_message }}
+            - **Link**: <https://github.com/${{ matrix.repo.repo }}/commit/${{ steps.get-def-hash.outputs.def_hash }}>
           labels: update-checker, defconfig-update
           token: ${{ secrets.GITHUB_TOKEN }}
 

@@ -22,12 +22,12 @@ You need to prepare the following items before using this template.
   - The line starting with `![Badge]` in `.md` file will be replaced with meta data badge, including build time, target device, upstream repo and commit hash.
 
 - **`.yml` file:** Copy the template workflow file to your repository. Modify the filename, workflow name and `env` parts to fit your `.config`, `.sh` and `.md` files. **Note: The workflow name must be unique. Do not edit other parameters in the workflow file.**
-  - Setting `UPDATER_ENABLED` to `true` will enable the updater feature.
-  - `UPDATER_DEFCONFIG` signifies the path of default `.config` file that generates your own `.config` file in OpenWrt source code. *This is a special parameter for [padavanonly/immortalwrt-mt798x-24.10](https://github.com/padavanonly/immortalwrt-mt798x-24.10). See below for more details.*
+  - `UPDATER_ENABLED`: Set to `true` will enable the updater feature.
+  - `UPDATER_DEFCONFIG`: *Optional.* *Special parameter for upstream Immortalwrt source code [padavanonly/immortalwrt-mt798x-24.10](https://github.com/padavanonly/immortalwrt-mt798x-24.10).* Signifies the path of default `.config` file that generates your own `.config` file in source code. *See below for more details.*
 
 After completing the preparation, you can start building your firmware.
 
-- `update-checker` will check all workflow files under `.github/workflows`, find those workflow files with `UPDATER_ENABLED` set to `true`. Then `update-checker` will extract building data from each workflow file, check whether there is a newer version of OpenWrt source code, and trigger the firmware building if needed. `update-checker` will also check `DEFCONFIG` update (this usually indicate the kernel package or driver of the system has been updated, and you may need to update your `.config` file)(use for [padavanonly/immortalwrt-mt798x-24.10](https://github.com/padavanonly/immortalwrt-mt798x-24.10)) and send a issue to notify you.
+- `update-checker` will check all workflow files under `.github/workflows`, find those workflow files with `UPDATER_ENABLED` set to `true`. Then `update-checker` will extract building data from each workflow file, check whether there is a newer version of OpenWrt source code, and trigger the firmware building if needed. The `update-checker` will also check `DEFCONFIG` update (The default preset config used in [padavanonly/immortalwrt-mt798x-24.10](https://github.com/padavanonly/immortalwrt-mt798x-24.10), providing kernel optimization and closed source hardware driver config preseted. This  changes usually indicate the kernel package or driver of the system has been updated, and you may need to update your `.config` file) and send a issue to notify you.
 
 - You can also trigger any single profile via `Run workflow` button in the Github Actions page.
 
