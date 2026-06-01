@@ -91,7 +91,7 @@ jobs:
         run: |
           FILENAME=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}" | \
-            jq -r '.path | split("/") | .[-1]')
+            jq -R -r 'fromjson? | .path | select(type == "string") | split("/")[-1] // empty')
 
           FILENAME=${FILENAME%.yml}
 
