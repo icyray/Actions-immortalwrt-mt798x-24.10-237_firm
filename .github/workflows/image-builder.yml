@@ -192,7 +192,7 @@ jobs:
           grep -q "!\[Badge\]" "${RELEASE_FILE}" && sed -i "/!\[Badge\]/r ${BADGE}" "${RELEASE_FILE}" && sed -i "/!\[Badge\]/d" "${RELEASE_FILE}" || sed -i "1r ${BADGE}" "${RELEASE_FILE}"
 
       - name: Upload firmware to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@master
         if: steps.tag.conclusion == 'success' && steps.organize.conclusion == 'success' && !cancelled()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

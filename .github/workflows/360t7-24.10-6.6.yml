@@ -100,7 +100,7 @@ jobs:
 
       - name: Force update repo hash cache
         id: cache-repo-hash
-        uses: actions/cache@v3
+        uses: actions/cache@main
         with:
           path: .repo-hash
           key: repo-hash_${{ steps.get-filename.outputs.filename }}_${{ needs.call-builder.outputs.repo_hash }}

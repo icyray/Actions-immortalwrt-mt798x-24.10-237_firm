@@ -26,12 +26,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@main
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@main
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install dependencies
         run: |
@@ -40,7 +40,7 @@ jobs:
 
       - name: Get environment from workflows
         id: get-env
-        uses: actions/github-script@v7
+        uses: actions/github-script@main
         with:
           script: |
             const fs = require('fs');
@@ -114,7 +114,7 @@ jobs:
 
       - name: Check repo hash
         id: cache-repo-hash
-        uses: actions/cache@v3
+        uses: actions/cache@main
         with:
           path: .repo-hash
           key: repo-hash_${{matrix.repo.filename}}_${{ steps.get-hash.outputs.repo_hash }}
@@ -123,7 +123,7 @@ jobs:
       - name: Check defconfig hash
         id: cache-def-hash
         if: matrix.repo.defcfg && steps.get-def-hash.outputs.def_hash != 'null'
-        uses: actions/cache@v3
+        uses: actions/cache@main
         with:
           path: .def-hash
           key: def-hash_${{matrix.repo.filename}}_${{ steps.get-def-hash.outputs.def_hash }}
@@ -154,7 +154,7 @@ jobs:
 
       - name: Trigger build
         if: steps.cache-repo-hash.outputs.cache-hit != 'true' && success()
-        uses: benc-uk/workflow-dispatch@v1
+        uses: benc-uk/workflow-dispatch@main
         with:
           workflow: ${{ matrix.repo.name }}
 
