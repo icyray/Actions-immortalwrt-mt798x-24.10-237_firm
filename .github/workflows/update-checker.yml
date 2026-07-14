@@ -94,8 +94,8 @@ jobs:
         run: |
           repo_data=$(curl -s -L 'https://api.github.com/repos/${{ matrix.repo.repo }}/commits/${{ matrix.repo.branch }}')
 
-          repo_hash=$(echo "$repo_data" | jq -R -r 'fromjson? | .sha // empty')
-          repo_message=$(echo "$repo_data" | jq -R -r 'fromjson? | .commit.message | select(type == "string") | split("\n")[0] // empty')
+          repo_hash=$(echo "$repo_data" | jq -n -R -r '[inputs] | join("\n") | fromjson? | .sha // empty')
+          repo_message=$(echo "$repo_data" | jq -n -R -r '[inputs] | join("\n") | fromjson? | .commit.message | select(type == "string") | split("\n")[0] // empty')
 
           echo "repo_hash=${repo_hash}" >> $GITHUB_OUTPUT
           echo "repo_message=${repo_message}" >> $GITHUB_OUTPUT
@@ -106,8 +106,8 @@ jobs:
         run: |
           def_data=$(curl -s -L 'https://api.github.com/repos/${{ matrix.repo.repo }}/commits?path=${{ matrix.repo.defcfg }}&sha=${{ matrix.repo.branch }}')
 
-          def_hash=$(echo "$def_data" | jq -R -r 'fromjson? | .[0].sha // empty')
-          def_message=$(echo "$def_data" | jq -R -r 'fromjson? | .[0].commit.message | select(type == "string") | split("\n")[0] // empty')
+          def_hash=$(echo "$def_data" | jq -n -R -r '[inputs] | join("\n") | fromjson? | .[0].sha // empty')
+          def_message=$(echo "$def_data" | jq -n -R -r '[inputs] | join("\n") | fromjson? | .[0].commit.message | select(type == "string") | split("\n")[0] // empty')
 
           echo "def_hash=${def_hash}" >> $GITHUB_OUTPUT
           echo "def_message=${def_message}" >> $GITHUB_OUTPUT
