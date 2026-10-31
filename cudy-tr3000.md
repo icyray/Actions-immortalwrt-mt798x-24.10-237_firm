@@ -4,7 +4,6 @@
 
 Software
 
-- luci-app-argon-config
 - luci-app-autoreboot
 - luci-app-diskman
 - luci-app-passwall2 (xray only)
