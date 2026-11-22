@@ -10,6 +10,10 @@
 
 # theme
 rm -rf feeds/luci/themes/luci-theme-argon
+rm -rf feeds/luci/applications/luci-app-argon-config
+rm -f  package/feeds/luci/luci-theme-argon
+rm -f  package/feeds/luci/luci-app-argon-config
+rm -rf package/luci-theme-argon
 git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
 
 # passwall
